@@ -1,0 +1,61 @@
+{
+  "name": "n8n-nodes-jev-ai",
+  "version": "1.0.0",
+  "description": "Production-grade n8n community node for TypeSafe Jev AI: System-1 calibrated decision intelligence, dynamic multi-branch routing, policy guardrails, and AI Agent tools.",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "n8n-node",
+    "jev",
+    "jev-ai",
+    "typesafe",
+    "system-one",
+    "decision-intelligence",
+    "classification",
+    "routing",
+    "guardrails",
+    "agent-tool",
+    "ai",
+    "rlcd"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ali-abdullahx1/n8n-nodes-jev-ai#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ali-abdullahx1/n8n-nodes-jev-ai.git"
+  },
+  "author": {
+    "name": "Ali Abdullah",
+    "url": "https://github.com/ali-abdullahx1"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && node scripts/copy-assets.js",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/JevAiApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/JevAi/JevAi.node.js"
+    ]
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "n8n-workflow": "^1.60.0",
+    "typescript": "^5.6.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}

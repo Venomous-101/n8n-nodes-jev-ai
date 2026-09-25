@@ -1,0 +1,22 @@
+{
+  "node": "n8n-nodes-jev-ai.jevAi",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": [
+    "AI",
+    "Data & Storage",
+    "Core Nodes"
+  ],
+  "resources": {
+    "primaryDocumentation": [
+      {
+        "url": "https://github.com/ali-abdullahx1/n8n-nodes-jev-ai#readme"
+      }
+    ],
+    "credentialDocumentation": [
+      {
+        "url": "https://docs.typesafe.ai"
+      }
+    ]
+  }
+}

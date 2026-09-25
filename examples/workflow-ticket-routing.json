@@ -1,0 +1,43 @@
+{
+  "name": "Jev AI - Intelligent Ticket Routing & Triage",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "route",
+        "model": "jev-latest",
+        "state": "={{ $json.message }}",
+        "routeInstructions": "Which department is best suited to resolve this customer ticket?",
+        "routes": {
+          "values": [
+            {
+              "name": "billing",
+              "description": "Payment failures, credit card charges, invoices, refund inquiries"
+            },
+            {
+              "name": "technical",
+              "description": "API 500 errors, system crashes, bug reports, software integration issues"
+            },
+            {
+              "name": "sales",
+              "description": "Enterprise quotes, pricing inquiries, custom plan requests, onboarding"
+            }
+          ]
+        },
+        "lowConfidenceHandling": "sendToLowConfidenceOutput",
+        "routeConfidenceThreshold": 0.65
+      },
+      "id": "jev-router-1",
+      "name": "Jev AI Router",
+      "type": "n8n-nodes-jev-ai.jevAi",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "jevAiApi": {
+          "id": "my-jev-credential",
+          "name": "TypeSafe Jev AI"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}

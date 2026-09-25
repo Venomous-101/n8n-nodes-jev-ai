@@ -1,0 +1,27 @@
+{
+  "name": "Jev AI - LLM Safety & Policy Guardrail Gate",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "guardrail",
+        "model": "jev-latest",
+        "state": "={{ $json.llm_output }}",
+        "policyCriteria": "Check whether this text violates company privacy, reveals internal API keys or passwords, or contains harmful or defamatory statements.",
+        "actionOnViolation": "splitOutput",
+        "guardrailThreshold": 0.7
+      },
+      "id": "jev-guardrail-1",
+      "name": "Jev AI Guardrail",
+      "type": "n8n-nodes-jev-ai.jevAi",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "jevAiApi": {
+          "id": "my-jev-credential",
+          "name": "TypeSafe Jev AI"
+        }
+      }
+    }
+  ],
+  "connections": {}
+}
