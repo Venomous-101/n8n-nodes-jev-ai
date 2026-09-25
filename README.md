@@ -171,7 +171,7 @@ npm link n8n-nodes-jev-ai
 
 This package includes a pre-configured GitHub Actions workflow (`.github/workflows/publish.yml`) that publishes directly to npm with **provenance statements** (`--provenance`), fulfilling the strict requirements for the **n8n Creator Portal** verification.
 
-1. Commit and push this repository to GitHub under your account (`ali-abdullahx1/n8n-nodes-jev-ai`).
+1. Commit and push this repository to GitHub under your account (`Venomous-101/n8n-nodes-jev-ai`).
 2. Add your `NPM_TOKEN` as a secret in your GitHub repository (**Settings** > **Secrets and variables** > **Actions**).
 3. Create and push a version tag:
    ```bash

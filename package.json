@@ -19,14 +19,14 @@
     "rlcd"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/ali-abdullahx1/n8n-nodes-jev-ai#readme",
+  "homepage": "https://github.com/Venomous-101/n8n-nodes-jev-ai#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ali-abdullahx1/n8n-nodes-jev-ai.git"
+    "url": "git+https://github.com/Venomous-101/n8n-nodes-jev-ai.git"
   },
   "author": {
-    "name": "Ali Abdullah",
-    "url": "https://github.com/ali-abdullahx1"
+    "name": "Ali Abdullah (Venomous-101)",
+    "url": "https://github.com/Venomous-101"
   },
   "main": "index.js",
   "scripts": {
