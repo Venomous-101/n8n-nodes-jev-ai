@@ -861,9 +861,6 @@ export class JevAi implements INodeType {
 					});
 					continue;
 				}
-				if (error instanceof NodeApiError || error instanceof NodeOperationError) {
-					throw error;
-				}
 				throw new NodeApiError(this.getNode(), error as any);
 			}
 		}
