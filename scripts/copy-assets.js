@@ -31,4 +31,9 @@ const nodesSrc = path.join(rootDir, 'nodes');
 const nodesDest = path.join(rootDir, 'dist', 'nodes');
 
 copyRecursiveSync(nodesSrc, nodesDest);
+
+const credentialsSrc = path.join(rootDir, 'credentials');
+const credentialsDest = path.join(rootDir, 'dist', 'credentials');
+copyRecursiveSync(credentialsSrc, credentialsDest);
+
 console.log('Asset copy complete.');

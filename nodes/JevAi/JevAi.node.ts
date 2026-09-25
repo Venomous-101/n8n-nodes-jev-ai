@@ -5,7 +5,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError, jsonParse } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, NodeOperationError, jsonParse } from 'n8n-workflow';
 import { formatState, jevApiRequest } from './GenericFunctions';
 import type { IJevApiResponse } from './types';
 
@@ -13,7 +13,7 @@ export class JevAi implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Jev AI',
 		name: 'jevAi',
-		icon: 'file:jevai.svg',
+		icon: { light: 'file:jevai.svg', dark: 'file:jevai.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
@@ -72,7 +72,7 @@ export class JevAi implements INodeType {
 						value: 'route',
 						description:
 							'Evaluate state and dynamically route item to corresponding output branch',
-						action: 'Route item dynamically based on Jev decision',
+						action: 'Route item dynamically based on choice',
 					},
 					{
 						name: 'Policy Guardrail',
@@ -157,14 +157,6 @@ export class JevAi implements INodeType {
 						displayName: 'Question',
 						values: [
 							{
-								displayName: 'Output Property ID',
-								name: 'id',
-								type: 'string',
-								default: 'category',
-								required: true,
-								description: 'Field name where this answer will be written in the output',
-							},
-							{
 								displayName: 'Answer Type',
 								name: 'type',
 								type: 'options',
@@ -188,14 +180,6 @@ export class JevAi implements INodeType {
 								default: 'choice',
 							},
 							{
-								displayName: 'Instructions',
-								name: 'instructions',
-								type: 'string',
-								default: '',
-								required: true,
-								description: 'The exact question for Jev to evaluate on the state',
-							},
-							{
 								displayName: 'Choices (One Per Line)',
 								name: 'choiceOptions',
 								type: 'string',
@@ -210,6 +194,34 @@ export class JevAi implements INodeType {
 								default: '',
 								placeholder: 'billing: Payments and invoices\ntech: Technical bugs\nsales: Product inquiries',
 								description: 'Format: "option_key: description" per line. Jev picks the most fitting option.',
+							},
+							{
+								displayName: 'Instructions',
+								name: 'instructions',
+								type: 'string',
+								default: '',
+								required: true,
+								description: 'The exact question for Jev to evaluate on the state',
+							},
+							{
+								displayName: 'No Means',
+								name: 'noMeans',
+								type: 'string',
+								displayOptions: {
+									show: {
+										type: ['noul'],
+									},
+								},
+								default: '',
+								description: 'Optional guidance on when the answer should be evaluated as No',
+							},
+							{
+								displayName: 'Output Property ID',
+								name: 'id',
+								type: 'string',
+								default: 'category',
+								required: true,
+								description: 'Field name where this answer will be written in the output',
 							},
 							{
 								displayName: 'Score Levels (Lowest First)',
@@ -237,18 +249,6 @@ export class JevAi implements INodeType {
 								},
 								default: '',
 								description: 'Optional guidance on when the answer should be evaluated as Yes',
-							},
-							{
-								displayName: 'No Means',
-								name: 'noMeans',
-								type: 'string',
-								displayOptions: {
-									show: {
-										type: ['noul'],
-									},
-								},
-								default: '',
-								description: 'Optional guidance on when the answer should be evaluated as No',
 							},
 						],
 					},
@@ -415,7 +415,7 @@ export class JevAi implements INodeType {
 				},
 				options: [
 					{
-						name: 'Split into Passed / Violated Outputs',
+						name: 'Split Into Passed / Violated Outputs',
 						value: 'splitOutput',
 						description: 'Routes compliant items to output 1 and violations to output 2',
 					},
@@ -861,7 +861,10 @@ export class JevAi implements INodeType {
 					});
 					continue;
 				}
-				throw error;
+				if (error instanceof NodeApiError || error instanceof NodeOperationError) {
+					throw error;
+				}
+				throw new NodeApiError(this.getNode(), error as any);
 			}
 		}
 

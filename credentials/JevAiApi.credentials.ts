@@ -8,6 +8,7 @@ import {
 export class JevAiApi implements ICredentialType {
 	name = 'jevAiApi';
 	displayName = 'Jev AI API';
+	icon = { light: 'file:jevai.svg', dark: 'file:jevai.svg' } as any;
 	documentationUrl = 'https://docs.typesafe.ai';
 	properties: INodeProperties[] = [
 		{

@@ -6,6 +6,7 @@ import {
 	IHttpRequestOptions,
 	NodeApiError,
 	NodeOperationError,
+	sleep,
 } from 'n8n-workflow';
 
 export async function jevApiRequest(
@@ -48,7 +49,7 @@ export async function jevApiRequest(
 						waitTimeMs = seconds * 1000;
 					}
 				}
-				await new Promise((resolve) => setTimeout(resolve, waitTimeMs));
+				await sleep(waitTimeMs);
 				continue;
 			}
 			throw new NodeApiError(this.getNode(), error);
