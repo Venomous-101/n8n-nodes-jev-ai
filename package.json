@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-jev-ai",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Production-grade n8n community node for TypeSafe Jev AI: System-1 calibrated decision intelligence, dynamic multi-branch routing, policy guardrails, and AI Agent tools.",
   "keywords": [
     "n8n-community-node-package",

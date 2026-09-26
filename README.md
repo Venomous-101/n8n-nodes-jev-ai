@@ -4,85 +4,92 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![n8n community node](https://img.shields.io/badge/n8n-community--node-ea4b71.svg)](https://n8n.io)
 
-An advanced community node for [n8n](https://n8n.io/) that brings **TypeSafe Jev AI**—the groundbreaking **"System 1" decision intelligence model**—directly into your automated workflows and AI agents.
+An n8n community node for **TypeSafe Jev**, the System-1 decision intelligence model. 
 
-Unlike traditional conversational LLMs that generate free-form text token-by-token, **Jev is purpose-built for software logic**. It delivers structured, calibrated, and typed decisions (Choices, Scores, and Probabilities) with sub-second latency and zero hallucination risk.
-
----
-
-## 🚀 Key Features
-
-* **⚡ Ask Structured Questions (Parallel Evaluator):**
-  Evaluate input state in parallel across three decision primitives:
-  * **Choice:** Multi-class classification with complete probability distributions and confidence scores.
-  * **Score:** Numerical ratings along ordered rubrics (e.g., urgency 1–5, customer frustration, risk severity).
-  * **Noul:** Calibrated Yes/No boolean probabilities (0.0 to 1.0) with explicit criteria.
-
-* **🔀 Route by Choice (Dynamic Visual Routing):**
-  Dynamically generates visual output branches on your n8n canvas for each designated route, plus an automated **Low Confidence** fallback branch for human-in-the-loop review.
-
-* **🛡️ Policy & Safety Guardrails:**
-  Instantly evaluate LLM prompts or outputs against strict compliance rules, safety policies, secret leak detection, or hallucinations with configurable actions (split branch, flag output, or halt workflow).
-
-* **🤖 Native AI Agent Tool Integration:**
-  Exposed with `usableAsTool: true`—connect Jev directly into n8n's **AI Agent** nodes as a calibrated decision tool, allowing autonomous agents to execute swift, deterministic policy and routing decisions.
-
-* **🔄 Resilience & Backoff:**
-  Built-in exponential backoff and jitter handling for API rate limits (`429`) and server load (`529`), honoring `Retry-After` headers.
+Traditional conversational LLMs are designed to generate natural language text, which makes them slow, expensive, and prone to formatting errors when used strictly for software logic. Jev is purpose-built for deterministic decision tasks: it evaluates inputs against typed questions and returns structured decisions with calibrated probabilities in under a second.
 
 ---
 
-## 📦 Installation
+## Why Jev in n8n Workflows?
 
-### Via n8n Community Nodes (Recommended)
+| Feature | Standard LLM (GPT-4 / Claude) | TypeSafe Jev AI |
+| :--- | :--- | :--- |
+| **Output Type** | Unstructured text or Markdown | Typed primitives (Choice, Score, Boolean) |
+| **Confidence** | Subjective / Uncalibrated | Mathematical probabilities (0.0 to 1.0) |
+| **Latency** | 2,000ms - 8,000ms | 100ms - 400ms |
+| **Hallucination Risk** | High | Zero (constrained schema) |
+| **Cost** | High token overhead | Fraction of conversational LLM cost |
+
+---
+
+## Core Capabilities
+
+### 1. Ask Questions
+Evaluate text or structured JSON state across three distinct decision primitives:
+* **Choice:** Multi-class classification with confidence scores and full probability distributions across all choices.
+* **Score:** Ordinal numerical ratings evaluated against sequential criteria (for example, urgency levels 1 through 5, sentiment severity, or customer frustration).
+* **Noul:** Calibrated boolean decisions (Yes / No) with explicit positive and negative criteria.
+
+### 2. Route by Choice
+Split incoming data across multiple visual branches directly on the n8n canvas:
+* Each configured choice dynamically generates a distinct output port on the node.
+* Includes an automated **Low Confidence** fallback port. If Jev's certainty falls below your configured threshold, the item routes to human review rather than executing automated downstream actions.
+
+### 3. Policy & Safety Guardrails
+Evaluate user prompts, external payloads, or generative model completions against security and compliance rules:
+* Configurable actions on violation: split execution into Passed and Violated branches, raise an error to halt the workflow, or flag the payload with violation metrics.
+
+### 4. Native AI Agent Tool
+The node implements `usableAsTool: true`. You can connect Jev AI directly to the Tools input of n8n's LangChain AI Agent nodes, allowing conversational agents to delegate fast, deterministic routing decisions without extra token overhead.
+
+---
+
+## Installation
+
+### Method 1: Community Nodes (Recommended)
 1. In your n8n workspace, navigate to **Settings** > **Community Nodes**.
 2. Click **Install a community node**.
 3. Enter `n8n-nodes-jev-ai` in the package name field.
-4. Check the agreement box and click **Install**.
+4. Accept the community node terms and click **Install**.
 
-### Self-Hosted / Docker
-Run the following command inside your n8n root directory:
+### Method 2: Docker / Self-Hosted CLI
+Run the following command inside your n8n installation directory:
 ```bash
 npm install n8n-nodes-jev-ai
 ```
-Or add `n8n-nodes-jev-ai` to your custom n8n Docker image dependencies.
+Restart your n8n instance after installation.
 
 ---
 
-## 🔑 Credentials Setup
+## Credentials Setup
 
-1. Sign up and obtain an API key from the [TypeSafe Console](https://console.typesafe.ai).
-2. In n8n, create a new credential and choose **Jev AI API**.
-3. Enter your **API Key** (starts with `ts_`).
-4. (Optional) Set the **Base URL** (default is `https://api.typesafe.ai/v1`).
-5. Click **Save**—n8n will automatically verify the credential with a live health ping.
+1. Obtain your API key from the [TypeSafe Console](https://console.typesafe.ai).
+2. In n8n, create a new credential and select **Jev AI API**.
+3. Enter your **API Key** (prefixed with `ts_`).
+4. (Optional) Provide a custom **Base URL** (defaults to `https://api.typesafe.ai/v1`).
+5. Click **Save**. n8n validates the credential with an automated health check against the endpoint.
 
 ---
 
-## 🛠️ Operations Guide
+## Operations Reference
 
-### 1. Ask Questions (`askQuestions`)
-Evaluate any incoming text, support ticket, webhook payload, or JSON state with one or more typed questions.
+### Operation: Ask Questions (`askQuestions`)
 
-#### Form Builder Mode
-Define questions visually in the n8n UI:
-* **Output Property ID:** Target key in the output (e.g. `department`).
-* **Answer Type:** `Choice`, `Score`, or `Noul`.
-* **Instructions:** Exact question for Jev (e.g., *Which department should resolve this ticket?*).
-* **Options / Rubrics:** 
-  ```text
-  billing: Payment errors, invoices, refunds, charges
-  technical: System crashes, API bugs, outages
-  sales: Product inquiries, enterprise pricing, licenses
-  ```
+Evaluates the incoming state against one or more questions configured via Form Builder or raw JSON.
 
-#### JSON Mode
-Paste question definitions matching the official TypeSafe schema directly for maximum flexibility.
-
-#### Sample Output (Simplified):
+#### Example Input State:
 ```json
 {
-  "message": "I was double charged for invoice INV-9021. Please issue a refund.",
+  "ticketId": "TCK-8041",
+  "text": "I was double billed on invoice INV-204. Please reverse the duplicate charge."
+}
+```
+
+#### Example Output:
+```json
+{
+  "ticketId": "TCK-8041",
+  "text": "I was double billed on invoice INV-204. Please reverse the duplicate charge.",
   "jev": {
     "department": "billing",
     "department_confidence": 0.96,
@@ -91,8 +98,6 @@ Paste question definitions matching the official TypeSafe schema directly for ma
       "technical": 0.03,
       "sales": 0.01
     },
-    "is_urgent": true,
-    "is_urgent_probability": 0.88,
     "_model": "jev-1.13.0"
   }
 }
@@ -100,51 +105,45 @@ Paste question definitions matching the official TypeSafe schema directly for ma
 
 ---
 
-### 2. Route by Choice (`route`)
-Split incoming items across multiple paths visually on the canvas.
+### Operation: Route by Choice (`route`)
 
-1. **Routing Instructions:** e.g. *Which team should handle this inquiry?*
-2. **Routes:** Add two or more named routes. Each route name becomes a distinct output connector on the node!
-3. **Low Confidence Fallback:**
-   * Set **Low Confidence Handling** to `Send to Low Confidence Output`.
-   * Set **Confidence Threshold** (e.g. `0.65`).
-   * Any item where Jev's top choice confidence falls below `0.65` will automatically be routed to the **Low Confidence** branch for manual human review!
+Directs each item to a designated output connector based on the evaluated choice.
+
+1. **Routing Instructions:** The prompt question guiding the model (for example, *Which team should handle this inquiry?*).
+2. **Routes:** Define two or more target routes with descriptions.
+3. **Confidence Threshold:** Items where top-choice confidence is below this value (default `0.60`) automatically divert to the **Low Confidence** branch.
 
 ---
 
-### 3. Policy Guardrail (`guardrail`)
-Safeguard AI pipelines against prompt injection, toxic content, data leaks, or policy violations.
+### Operation: Policy Guardrail (`guardrail`)
 
-* **Policy Criteria:** Plain English rules describing what constitutes a violation.
+Validates content against safety, data privacy, or compliance criteria.
+
+* **Policy Criteria:** Plain text description of what constitutes a violation (for example, *Contains API keys, passwords, or personal identifying numbers*).
 * **Action on Violation:**
-  * `Split into Passed / Violated Outputs`: Output 1 receives compliant items; Output 2 receives violations.
-  * `Stop Workflow with Error`: Halts execution immediately if a violation is detected.
-  * `Flag in Output Only`: Appends `jev_guardrail: { passed: boolean, violation_probability: number }` to the item.
+  * `Split into Passed / Violated Outputs`: Directs compliant items to Port 1 and violations to Port 2.
+  * `Stop Workflow with Error`: Halts workflow execution immediately.
+  * `Flag in Output Only`: Adds `jev_guardrail` metadata to the item without altering workflow flow.
 
 ---
 
-## 📂 Example Workflows
+## Security and Reliability
 
-Pre-configured workflows are located in the [`examples/`](examples) directory:
-
-1. **[Customer Ticket Routing](examples/workflow-ticket-routing.json):** Automatically classifies incoming tickets and routes them to `billing`, `technical`, `sales`, or `Low Confidence`.
-2. **[LLM Guardrail Gate](examples/workflow-ai-guardrail.json):** Inspects generative AI responses before they reach end users or external databases.
-
-To import: In n8n, click **Workflows** > **Import from File**, select the JSON file, and link your Jev AI credential.
-
----
-
-## 💡 Best Practices for Jev AI
-
-* **One Decision per Question:** Ask *Is it urgent?* and *Which team?* as separate questions rather than a compound question.
-* **Clear Criteria:** Distinguish borderline cases inside your option descriptions.
-* **Calibrated Thresholds:** High-stakes actions (such as automated refunds) should require higher confidence thresholds (e.g. `0.85+`), while low-stakes routing can operate safely around `0.55+`.
+* **Zero Runtime Dependencies:** The package ships with zero third-party runtime npm dependencies, eliminating supply-chain vulnerabilities.
+* **Prototype Pollution Protection:** Property parsing explicitly validates and rejects object prototype keys (`__proto__`, `constructor`, `prototype`).
+* **Protocol Validation:** Strict URL parsing ensures only `http:` and `https:` endpoints can be queried.
+* **Memory Exhaustion Defense:** Payload inputs have a 2MB length safety threshold to prevent memory consumption attacks.
+* **Transient Error Handling:** Built-in exponential backoff with jitter automatically handles rate limits (`429`), server overload (`529`), and temporary cloud gateway responses (`502`, `503`, `504`).
 
 ---
 
-## 🧑‍💻 Development
+## Local Development
 
 ```bash
+# Clone the repository
+git clone https://github.com/Venomous-101/n8n-nodes-jev-ai.git
+cd n8n-nodes-jev-ai
+
 # Install dependencies
 npm install
 
@@ -155,16 +154,8 @@ npm run build
 npm run dev
 ```
 
-### Local Testing with n8n
-To test locally inside your self-hosted n8n instance:
-```bash
-# In this directory:
-npm link
+---
 
-# In your ~/.n8n/custom directory:
-npm link n8n-nodes-jev-ai
-```
-
-## 📄 License
+## License
 
 [MIT](LICENSE) © Ali Abdullah
