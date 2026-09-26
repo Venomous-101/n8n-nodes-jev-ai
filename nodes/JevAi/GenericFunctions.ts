@@ -27,7 +27,7 @@ export async function jevApiRequest(
 		qs: query,
 		headers: {
 			'Content-Type': 'application/json',
-			'User-Agent': 'n8n-nodes-jev-ai/1.0.0',
+			'User-Agent': 'n8n-nodes-jev-ai/1.0.6',
 		},
 		json: true,
 	};
@@ -38,9 +38,10 @@ export async function jevApiRequest(
 			attempt++;
 			return await this.helpers.httpRequestWithAuthentication.call(this, 'jevAiApi', options);
 		} catch (error: any) {
-			const statusCode = error.statusCode || error.response?.status;
-			// 429 = Rate Limit, 529 = Overloaded
-			if ((statusCode === 429 || statusCode === 529) && attempt <= maxRetries) {
+			const statusCode = error.statusCode || error.httpCode || error.response?.status;
+			// Retry on rate limits (429), overload (529), or transient cloud gateways (502, 503, 504)
+			const isTransient = [429, 502, 503, 504, 529].includes(statusCode);
+			if (isTransient && attempt <= maxRetries) {
 				const retryAfterHeader = error.response?.headers?.['retry-after'];
 				let waitTimeMs = Math.pow(2, attempt) * 1000 + Math.random() * 500;
 				if (retryAfterHeader) {
@@ -51,6 +52,9 @@ export async function jevApiRequest(
 				}
 				await sleep(waitTimeMs);
 				continue;
+			}
+			if (error instanceof NodeApiError || error instanceof NodeOperationError) {
+				throw error;
 			}
 			throw new NodeApiError(this.getNode(), error);
 		}
