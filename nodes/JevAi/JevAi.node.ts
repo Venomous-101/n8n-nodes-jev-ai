@@ -592,9 +592,11 @@ export class JevAi implements INodeType {
 							);
 						}
 
+						const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 						for (const q of questionsUi) {
 							const id = q.id.trim();
-							if (!id) continue;
+							if (!id || DANGEROUS_KEYS.has(id)) continue;
 
 							if (q.type === 'choice') {
 								const criteria: Record<string, string> = {};
@@ -607,9 +609,13 @@ export class JevAi implements INodeType {
 									if (colonIdx !== -1) {
 										const key = line.slice(0, colonIdx).trim();
 										const desc = line.slice(colonIdx + 1).trim();
-										criteria[key] = desc;
+										if (!DANGEROUS_KEYS.has(key)) {
+											criteria[key] = desc;
+										}
 									} else {
-										criteria[line] = line;
+										if (!DANGEROUS_KEYS.has(line)) {
+											criteria[line] = line;
+										}
 									}
 								}
 								questionsPayload[id] = {
@@ -704,11 +710,12 @@ export class JevAi implements INodeType {
 						name: string;
 						description: string;
 					}>;
-					const threshold = this.getNodeParameter(
+					const rawThreshold = this.getNodeParameter(
 						'routeConfidenceThreshold',
 						itemIndex,
 						0.6,
 					) as number;
+					const threshold = isNaN(rawThreshold) ? 0.6 : Math.max(0, Math.min(1, rawThreshold));
 
 					if (routeFields.length < 2) {
 						throw new NodeOperationError(
@@ -719,9 +726,10 @@ export class JevAi implements INodeType {
 					}
 
 					const criteria: Record<string, string> = {};
+					const DANGEROUS_KEYS_ROUTE = new Set(['__proto__', 'constructor', 'prototype']);
 					for (const r of routeFields) {
 						const name = (r.name || '').trim();
-						if (name) {
+						if (name && !DANGEROUS_KEYS_ROUTE.has(name)) {
 							criteria[name] = r.description || name;
 						}
 					}
@@ -790,7 +798,8 @@ export class JevAi implements INodeType {
 				else if (operation === 'guardrail') {
 					const policyCriteria = this.getNodeParameter('policyCriteria', itemIndex) as string;
 					const action = this.getNodeParameter('actionOnViolation', itemIndex) as string;
-					const threshold = this.getNodeParameter('guardrailThreshold', itemIndex, 0.7) as number;
+					const rawThreshold = this.getNodeParameter('guardrailThreshold', itemIndex, 0.7) as number;
+					const threshold = isNaN(rawThreshold) ? 0.7 : Math.max(0, Math.min(1, rawThreshold));
 
 					const requestBody = {
 						model,

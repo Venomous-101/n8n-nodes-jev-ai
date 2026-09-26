@@ -18,7 +18,20 @@ export async function jevApiRequest(
 	maxRetries = 3,
 ): Promise<any> {
 	const credentials = await this.getCredentials('jevAiApi');
-	const baseUrl = ((credentials.baseUrl as string) || 'https://api.typesafe.ai/v1').replace(/\/+$/, '');
+	const rawBaseUrl = (credentials.baseUrl as string) || 'https://api.typesafe.ai/v1';
+	let parsedBaseUrl: URL;
+	try {
+		parsedBaseUrl = new URL(rawBaseUrl);
+		if (!['http:', 'https:'].includes(parsedBaseUrl.protocol)) {
+			throw new Error('Unsupported protocol');
+		}
+	} catch {
+		throw new NodeOperationError(
+			this.getNode(),
+			`Invalid Base URL provided: "${rawBaseUrl}". Only HTTP and HTTPS protocols are permitted.`,
+		);
+	}
+	const baseUrl = rawBaseUrl.replace(/\/+$/, '');
 
 	const options: IHttpRequestOptions = {
 		method,
@@ -27,7 +40,7 @@ export async function jevApiRequest(
 		qs: query,
 		headers: {
 			'Content-Type': 'application/json',
-			'User-Agent': 'n8n-nodes-jev-ai/1.0.6',
+			'User-Agent': 'n8n-nodes-jev-ai',
 		},
 		json: true,
 	};
@@ -61,19 +74,26 @@ export async function jevApiRequest(
 	}
 }
 
-export function formatState(inputState: any): string | Record<string, any> {
+const MAX_STATE_CHARACTERS = 2_000_000; // 2MB safety guardrail against memory exhaustion
+
+export function formatState(inputState: any): string {
 	if (inputState === null || inputState === undefined) {
 		return '';
 	}
+	let result = '';
 	if (typeof inputState === 'string') {
-		return inputState;
-	}
-	if (typeof inputState === 'object') {
+		result = inputState;
+	} else if (typeof inputState === 'object') {
 		try {
-			return JSON.stringify(inputState);
+			result = JSON.stringify(inputState);
 		} catch {
-			return String(inputState);
+			result = String(inputState);
 		}
+	} else {
+		result = String(inputState);
 	}
-	return String(inputState);
+	if (result.length > MAX_STATE_CHARACTERS) {
+		return result.substring(0, MAX_STATE_CHARACTERS);
+	}
+	return result;
 }
