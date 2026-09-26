@@ -15,7 +15,7 @@ The security of `n8n-nodes-jev-ai` is taken seriously. If you discover a potenti
 
 Instead, please report it directly through one of the following channels:
 1. **GitHub Security Advisories:** Use the "Report a vulnerability" button on this repository's Security tab.
-2. **Email:** Contact the maintainer directly at `aliabdullah0k09@gmail.com`.
+2. **Email:** Contact the maintainer directly at `eclipson07@gmail.com`.
 
 ### What to include in your report:
 * A detailed description of the vulnerability.
